@@ -1,0 +1,40 @@
+---
+alwaysApply: true
+---
+Castform brand color palette optimized for AI/voice platform aesthetics:
+
+**Brand Color Palette:**
+- Primary: `text-indigo-600 dark:text-indigo-400` (Castform's signature tech blue)
+- Secondary: `text-purple-600 dark:text-purple-400` (AI accent color)
+- Success: `text-emerald-600 dark:text-emerald-400` (call success, online status)
+- Warning: `text-amber-600 dark:text-amber-400` (usage warnings, limits)
+- Error: `text-red-600 dark:text-red-400` (call failures, errors)
+- Voice Active: `text-green-500 dark:text-green-400` (live call indicator)
+
+**Castform Component Branding:**
+- Hero Sections: `bg-gradient-to-br from-indigo-600 via-purple-600 to-indigo-800 text-white`
+- Primary Buttons: `bg-indigo-600 hover:bg-indigo-700 focus:bg-indigo-700 text-white shadow-lg shadow-indigo-500/25`
+- Secondary Buttons: `bg-purple-100 dark:bg-purple-900/30 hover:bg-purple-200 dark:hover:bg-purple-900/50 text-purple-700 dark:text-purple-300`
+- Agent Cards: `bg-white dark:bg-gray-800 border-l-4 border-indigo-500 text-gray-900 dark:text-gray-100`
+- Call Status Active: `bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-300`
+- Usage Metrics: `bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300`
+
+**Voice Platform Specific:**
+- Live Call Indicator: `bg-green-500 text-white animate-pulse`
+- Agent Online: `text-green-600 dark:text-green-400`
+- Agent Offline: `text-gray-400 dark:text-gray-500`
+- Minutes Usage: `text-indigo-600 dark:text-indigo-400 font-semibold`
+- Cost Display: `text-purple-600 dark:text-purple-400 font-mono`
+
+**Dashboard Theme:**
+- Sidebar: `bg-gray-900 text-gray-100`
+- Sidebar Active: `bg-indigo-600 text-white`
+- Main Background: `bg-gray-50 dark:bg-gray-900`
+- Card Backgrounds: `bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-shadow`
+
+**Gradient Accents:**
+- Headers: `bg-gradient-to-r from-indigo-500 to-purple-600`
+- CTAs: `bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700`
+- Progress Bars: `bg-gradient-to-r from-indigo-500 to-purple-500`
+
+Always maintain high contrast and ensure brand colors work harmoniously with voice/AI platform aesthetics.

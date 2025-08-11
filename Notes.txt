@@ -1,0 +1,24 @@
+**AGENT CREATION**
+
+Request Fields  
+- transcriber
+    -provider(google, *deepgram(nova-3, nova-2)(language(multi)), openai(gpt-4o-transcribe, gpt-4o-mini-transcribe))
+- model
+    -provider(
+        anthropic(claude-3-haiku-20240307, claude-3-5-sonnet-20241022, claude-3-7-sonnet-20250219, claude-opus-4-20250514)
+        deep-seek(deepseek-chat, deepseek-reasoner)
+        google(gemini-2.5-flash-lite, gemini-2.5-flash, gemini-2.5-pro, gemini-2.0-flash)
+        openai(gpt-4.1-mini, gpt-4.1, o3-mini, o3, gpt-4o, gpt-4o-mini, gpt-4-turbo)
+        )
+
+    -messages(content, role(assistant, function, user, system, tool))
+- voice
+    (deepgram(asteria, luna, stella, athena, hera, orion, arcas), 11labs(burt, marissa, andrea, sarah, phillip, steve, 11labs), openai(alloy, echo, fable, onyx, nova))
+
+- firstMessage(txt)
+- endCallMessage(txt)
+
+
+
+TODO:
+- Make sure user has a phone number connected before making call

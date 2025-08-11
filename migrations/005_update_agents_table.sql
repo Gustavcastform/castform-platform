@@ -1,0 +1,1 @@
+ALTER TABLE Agents ADD COLUMN tool TEXT;

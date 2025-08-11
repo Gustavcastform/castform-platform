@@ -1,0 +1,25 @@
+---
+alwaysApply: true
+---
+Run `npm run build` after code changes to verify build success, but use intelligent timing:
+
+**Always Build After:**
+- New API routes or middleware changes
+- Component structural changes or new imports
+- Environment variable modifications
+- Package.json dependency updates
+- TypeScript interface changes
+
+**Skip Builds For:**
+- Pure CSS/styling adjustments (Tailwind class changes)
+- Text content updates (copy changes, comments)
+- README or documentation updates
+
+**Error Handling:**
+- BLOCK: TypeScript errors, import errors, syntax errors
+- IGNORE: ESLint warnings (prefer, unused vars), accessibility warnings
+- INVESTIGATE: Build size warnings over 20% increase
+
+**Performance:**
+- Use `npm run build --debug` for verbose output when debugging
+- Cancel build after 2 minutes if hanging (likely dependency issue)

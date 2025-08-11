@@ -1,0 +1,44 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "castform-voice",
+	"compatibility_date": "2025-07-15",
+	"account_id": "64527ffa7fe8ba4c2423472e53228cad",
+	"compatibility_flags": [
+		"nodejs_compat",
+	],
+	"vars": { 
+		"GOOGLE_CLIENT_ID": "55276151234-ssptm54dnfb5h5vmn0152fc4mjjiei2j.apps.googleusercontent.com",
+		"GOOGLE_CLIENT_SECRET": "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",
+		"AUTH_SECRET":"X1kdyKYWOHsLf2NBO62kB3qUNbramay/3FC1O2+0Ir4=",
+		"ENCRYPTION_KEY": "cea6036607f7437274b6bbe472b23ffead1adc4798a905c98f0a14d21c0f9e01",
+		"API_BASE_URL": "http://localhost:3000",
+		"AUTH_URL": "http://localhost:3000",
+		"VAPI_PRIVATE_KEY": "4b103f90-a573-4955-84ac-15241d674016",
+		"VAPI_PUBLIC_KEY": "abe8f0cf-e41b-4ec0-b0fe-8cf6155d9f7b",
+		"GEMINI_API_KEY": "AIzaSyBTNju0uGQlKKHAKRSEjmtJr7VFy8BiNSo",
+		"VAPI_SECRET": "e41b15241d674016AIzaSyBTNju0uGQ",
+		"STRIPE_SECRET_KEY": "sk_test_51RuH9aLOIjiNvI4ZQa7Vbyu6bs5z0BTmycNXdWxPdTUnqSANCLhsgR0gMNW81lcYrRSCNTcM2SkCMQhlYiu97RBv00wbDFTbna",
+		"STRIPE_PUBLIC_KEY": "pk_test_51RuH9aLOIjiNvI4ZeEwrLvq9zHw9aDUgl7Q7jjEy8eRsd2Mk3TMVnIlDZ16H3jI8ik1ErRiXvQCqkReYZDXDuxH400MegpsohO",
+		"STRIPE_PRICE_ID": "price_1RuHoALOIjiNvI4ZY2zLAo3V",
+		"STRIPE_WEBHOOK_SECRET": "whsec_3b1aa09009a0404e2f1f7ad55ce566425bcade9a8c926b25cc7632ebb621592c"
+
+	},
+	"pages_build_output_dir": ".vercel/output/static",
+	"kv_namespaces": [
+		{
+			"binding": "CASTFORM_KV",
+			"id": "d151cbbe53dc45c88434c2ebb3ebb803",
+			"preview_id": "d151cbbe53dc45c88434c2ebb3ebb803"
+		}
+	],
+	"d1_databases": [
+    {
+        "binding": "CASTFORM_DB",
+        "database_name": "castform-voice",
+        "database_id": "162c1f70-7d90-4c3e-954f-68eb36853f3f"
+    }
+],
+	"observability": {
+		"enabled": true
+	}
+}

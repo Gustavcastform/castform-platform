@@ -1,0 +1,2 @@
+- Make tools more smart by using existing ones
+- add secret to vapi webhooks to authenticate requests

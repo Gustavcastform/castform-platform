@@ -1,0 +1,25 @@
+.PhoneInputInput {
+  background-color: transparent;
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: inherit;
+  color: inherit;
+}
+
+.PhoneInputCountry {
+  background-color: transparent;
+  border-right: 1px solid var(--border-color, #d1d5db);
+  padding-right: 0.5rem;
+  margin-right: 0.5rem;
+}
+
+.PhoneInputCountrySelect {
+  background-color: transparent;
+  border: none;
+  outline: none;
+}
+
+.PhoneInputCountryIcon {
+    box-shadow: none;
+}

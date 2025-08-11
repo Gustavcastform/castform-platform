@@ -1,0 +1,18 @@
+---
+alwaysApply: true
+---
+After significant architectural changes, new feature implementations, or major API additions, update or create a `project-spec.md` file in the project root to document:
+
+Update Triggers:
+New API endpoints or route changes
+Database schema modifications
+External service integrations
+Major component architecture changes
+Deployment or infrastructure updates
+Security or authentication changes
+
+Maintenance Notes:
+Review and update quarterly or after major releases
+Include performance considerations and known limitations
+Document any workarounds for Cloudflare Pages Edge Runtime constraints
+Keep environment setup instructions current

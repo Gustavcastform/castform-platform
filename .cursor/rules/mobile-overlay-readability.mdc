@@ -1,0 +1,22 @@
+---
+alwaysApply: true
+---
+Prioritize readability over aesthetics for all mobile overlays (dropdowns, modals, sheets, popover menus, tooltips):
+
+**Core Principle:** Mobile users must read overlay content clearly without background distraction, regardless of aesthetic appeal.
+
+**Implementation by Breakpoint:**
+- Mobile (< 768px): Use solid backgrounds `bg-white dark:bg-gray-900` 
+- Tablet/Desktop (≥ 768px): Glass effects allowed with `backdrop-blur-sm bg-white/95 dark:bg-gray-900/95`
+
+**Component-Specific Rules:**
+- Navigation dropdowns: Always solid on mobile `bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700`
+- Modal backdrops: `bg-black/60` minimum, `bg-black/80` preferred for mobile
+- Bottom sheets: Solid backgrounds `bg-white dark:bg-gray-900 rounded-t-xl shadow-2xl`
+- Popover menus: `bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg`
+- Tooltips: `bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900` (always high contrast)
+
+**Responsive Pattern Example:**
+```jsx
+className="bg-white dark:bg-gray-900 md:bg-white/95 md:dark:bg-gray-900/95 md:backdrop-blur-sm"
+```

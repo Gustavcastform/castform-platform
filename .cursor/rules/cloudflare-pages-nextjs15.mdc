@@ -1,0 +1,304 @@
+---
+alwaysApply: true
+---
+Comprehensive Cloudflare Pages Next.js 15 development with bindings, security, performance, and error handling:
+
+**Wrangler Configuration (wrangler.jsonc):**
+```json
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "my-next-app",
+  "compatibility_date": "2025-07-15",
+  "compatibility_flags": ["nodejs_compat"],
+  "pages_build_output_dir": ".vercel/output/static",
+  "kv_namespaces": [
+    {
+      "binding": "MY_KV",
+      "id": "your-kv-namespace-id",
+      "preview_id": "your-preview-kv-id"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "FILE_STORAGE",
+      "bucket_name": "my-bucket",
+      "preview_bucket_name": "my-preview-bucket"
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "DATABASE",
+      "database_name": "my-database",
+      "database_id": "your-d1-database-id",
+      "preview_database_id": "your-preview-d1-id"
+    }
+  ],
+  "vars": {
+    "ENVIRONMENT": "production",
+    "API_BASE_URL": "https://api.example.com"
+  }
+}
+```
+
+Environment (env.d.ts and wrangler.jsonc) not .env or .env.local. 
+In code, do not use process.env, look at provided examples.
+
+Server Component Pattern (Edge Runtime):
+
+```tsx
+export const runtime = 'edge'
+
+import { getRequestContext } from '@cloudflare/next-on-pages'
+import { z } from 'zod'
+
+// Input validation schema
+const CreateUserSchema = z.object({
+  name: z.string().min(1).max(100),
+  email: z.string().email(),
+  role: z.enum(['user', 'admin'])
+})
+
+export async function POST(request: Request) {
+  try {
+    const { env } = getRequestContext()
+    
+    // Parse and validate input
+    const body = await request.json()
+    const validated = CreateUserSchema.parse(body)
+    
+    // Sanitize and process
+    const sanitizedName = validated.name.trim()
+    const userId = crypto.randomUUID()
+    
+    // Database operation with error handling
+    const result = await env.DATABASE
+      .prepare('INSERT INTO users (id, name, email, role) VALUES (?, ?, ?, ?)')
+      .bind(userId, sanitizedName, validated.email, validated.role)
+      .run()
+    
+    // Cache user data in KV
+    await env.MY_KV.put(`user:${userId}`, JSON.stringify({
+      id: userId,
+      name: sanitizedName,
+      email: validated.email,
+      role: validated.role
+    }), { expirationTtl: 3600 })
+    
+    return Response.json({ 
+      success: true, 
+      userId,
+      message: 'User created successfully' 
+    }, {
+      headers: {
+        'Cache-Control': 'no-store',
+        'Content-Type': 'application/json'
+      }
+    })
+    
+  } catch (error) {
+    console.error('🚨 User creation error:', error.message?.substring(0, 200))
+    
+    if (error instanceof z.ZodError) {
+      return Response.json({ 
+        error: 'Validation failed', 
+        details: error.errors 
+      }, { status: 400 })
+    }
+    
+    if (error.message?.includes('UNIQUE constraint')) {
+      return Response.json({ 
+        error: 'User already exists' 
+      }, { status: 409 })
+    }
+    
+    return Response.json({ 
+      error: 'Internal server error',
+      code: 'USER_CREATE_FAILED'
+    }, { status: 500 })
+  }
+}
+
+// GET with caching and authentication
+export async function GET(request: Request) {
+  try {
+    const { env } = getRequestContext()
+    const url = new URL(request.url)
+    const userId = url.searchParams.get('id')
+    
+    if (!userId) {
+      return Response.json({ error: 'User ID required' }, { status: 400 })
+    }
+    
+    // Check cache first
+    const cached = await env.MY_KV.get(`user:${userId}`)
+    if (cached) {
+      return Response.json(JSON.parse(cached), {
+        headers: { 'X-Cache': 'HIT' }
+      })
+    }
+    
+    // Fetch from database
+    const user = await env.DATABASE
+      .prepare('SELECT * FROM users WHERE id = ?')
+      .bind(userId)
+      .first()
+    
+    if (!user) {
+      return Response.json({ error: 'User not found' }, { status: 404 })
+    }
+    
+    // Cache result
+    await env.MY_KV.put(`user:${userId}`, JSON.stringify(user), { 
+      expirationTtl: 3600 
+    })
+    
+    return Response.json(user, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+        'X-Cache': 'MISS'
+      }
+    })
+    
+  } catch (error) {
+    console.error('🔥 User fetch error:', error.message?.substring(0, 200))
+    return Response.json({ 
+      error: 'Failed to fetch user' 
+    }, { status: 500 })
+  }
+}
+```
+
+File Upload with R2:
+```tsx
+export async function POST(request: Request) {
+  try {
+    const { env } = getRequestContext()
+    const formData = await request.formData()
+    const file = formData.get('file') as File
+    
+    // Validate file
+    if (!file || file.size > 10 * 1024 * 1024) { // 10MB limit
+      return Response.json({ error: 'Invalid file or too large' }, { status: 400 })
+    }
+    
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp']
+    if (!allowedTypes.includes(file.type)) {
+      return Response.json({ error: 'File type not allowed' }, { status: 400 })
+    }
+    
+    // Generate secure filename
+    const fileId = crypto.randomUUID()
+    const extension = file.name.split('.').pop()
+    const key = `uploads/${fileId}.${extension}`
+    
+    // Upload to R2
+    await env.FILE_STORAGE.put(key, file.stream(), {
+      httpMetadata: {
+        contentType: file.type,
+        contentLength: file.size
+      }
+    })
+    
+    // Store metadata in D1
+    await env.DATABASE
+      .prepare('INSERT INTO files (id, original_name, key, size, type) VALUES (?, ?, ?, ?, ?)')
+      .bind(fileId, file.name, key, file.size, file.type)
+      .run()
+    
+    return Response.json({ 
+      success: true, 
+      fileId, 
+      key,
+      url: `/api/files/${fileId}`
+    })
+    
+  } catch (error) {
+    console.error('📁 Upload error:', error.message?.substring(0, 200))
+    return Response.json({ error: 'Upload failed' }, { status: 500 })
+  }
+}
+```
+
+Client Component with Error Handling:
+```tsx
+'use client'
+
+import { useState } from 'react'
+
+export default function UserForm() {
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setLoading(true)
+    setError('')
+    
+    try {
+      const formData = new FormData(e.currentTarget)
+      const response = await fetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.get('name'),
+          email: formData.get('email'),
+          role: formData.get('role')
+        })
+      })
+      
+      const data = await response.json()
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Something went wrong')
+      }
+      
+      // Success handling
+      console.log('✅ User created:', data.userId)
+      
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Network error')
+    } finally {
+      setLoading(false)
+    }
+  }
+  
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      {error && (
+        <div className="p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+          {error}
+        </div>
+      )}
+      {/* Form fields */}
+      <button 
+        type="submit" 
+        disabled={loading}
+        className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
+      >
+        {loading ? 'Creating...' : 'Create User'}
+      </button>
+    </form>
+  )
+}
+```
+
+Key Principles:
+
+All server routes use export const runtime = 'edge'
+Access bindings via getRequestContext().env
+Environment variables from wrangler.jsonc vars section
+Use Zod for input validation, sanitize all user input
+Implement proper error handling with specific error codes
+Group API routes by feature for better organization
+Handle file uploads with size/type validation
+Implement retry logic for external API calls
+Log errors with truncated messages for debugging
+
+Security Checklist:
+
+Input validation with Zod schemas
+File type and size restrictions
+Proper error messages without exposing internals
+Rate limiting considerations for API endpoints
+Sanitization of user-provided content
+Secure filename generation for uploads
